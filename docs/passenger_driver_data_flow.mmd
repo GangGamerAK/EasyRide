@@ -1,0 +1,54 @@
+flowchart TD
+  subgraph Passenger
+    P1["Passenger Dashboard\n(PassengerHomeView)\n- String passengerId\n- String passengerName\n- Map profile"]
+    P2["Passenger Profile\n(ProfileView)\n- String userId\n- Map profileData"]
+    P3["Passenger Chat\n(ChatView)\n- String chatId\n- String currentUserId\n- String otherUserName"]
+  end
+  subgraph Driver
+    D1["Driver Dashboard\n(DriverHomeView)\n- String driverId\n- String driverName\n- Map profile"]
+    D2["Driver Profile\n(ProfileView)\n- String userId\n- Map profileData"]
+    D3["Driver Chat\n(ChatView)\n- String chatId\n- String currentUserId\n- String otherUserName"]
+  end
+  subgraph Firestore
+    F1["Routes Collection\n- String routeId\n- List<LatLng> routePoints\n- String driverId/passengerId"]
+    F2["Users Collection\n- String userId\n- String name\n- String role\n- String contact"]
+    F3["Chats Collection\n- String chatId\n- String driverId\n- String passengerId\n- String status"]
+    F4["Messages Subcollection\n- String messageId\n- String chatId\n- String senderId\n- String type\n- Map offerData"]
+  end
+
+  %% Passenger actions
+  P1 -- views/edits --> P2
+  P1 -- views --> P3
+  P1 -- views --> F1
+  P1 -- views/edits --> F2
+  P1 -- sends offer --> F3
+  P3 -- sends message --> F4
+  P3 -- views chat --> F3
+
+  %% Driver actions
+  D1 -- views/edits --> D2
+  D1 -- views --> D3
+  D1 -- views --> F1
+  D1 -- views/edits --> F2
+  D1 -- accepts offer --> F3
+  D3 -- sends message --> F4
+  D3 -- views chat --> F3
+
+  %% Data flow between dashboards and Firestore
+  F3 -- has --> F4
+  F3 -- links to --> F1
+  F3 -- links to --> F2
+
+  %% Cross-user interactions
+  P1 -- offer/contract --> D1
+  D1 -- accept/contract --> P1
+  P3 -- chat --> D3
+  D3 -- chat --> P3
+
+  %% Profile updates
+  P2 -- updates --> F2
+  D2 -- updates --> F2
+
+  %% Route updates
+  D1 -- creates/updates --> F1
+  P1 -- creates/updates --> F1 

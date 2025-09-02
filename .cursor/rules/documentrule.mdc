@@ -1,0 +1,40 @@
+---
+alwaysApply: false
+---
+Preserve Non-Text Elements
+
+Do not remove or change the paths of images, charts, or media files.
+
+Do not modify XML tags or JSON keys for media. Keep them exactly as they are.
+
+Keep tables’ cell structure intact; only change text content inside cells.
+
+Maintain Document Structure
+
+Headings can be renamed, merged, or split, but keep their heading level (Heading 1, Heading 2, etc.) the same unless explicitly told otherwise.
+
+Always keep sections in valid hierarchical order (Heading 1 → Heading 2 → Heading 3…).
+
+When Renaming or Merging Sections
+
+Keep the section IDs and tags intact; only replace their text content.
+
+If merging two sections, combine their content under one heading and delete the extra heading tag without disturbing the XML/JSON structure.
+
+Content Editing
+
+You may rewrite sentences for clarity.
+
+You may rearrange paragraphs inside a section if needed.
+
+Keep placeholders for data (like {Table1} or {Image1}) unchanged.
+
+Formatting Rules
+
+Do not delete <w:p>, <w:tbl>, <w:tr>, or <w:tc> tags in XML (or their JSON equivalents).
+
+Do not insert raw text outside of <w:t> tags (or text fields in JSON).
+
+Output Rules
+
+Always produce a complete, valid JSON/XML structure that can be converted back into a .docx without errors.
