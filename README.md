@@ -1,121 +1,48 @@
-# EasyRide App
+## EasyRide – Carpooling App (Flutter)
 
-## Overview
-EasyRide is a Flutter-based ride-sharing platform that connects passengers and drivers by matching their routes. The app supports real-time route calculation, driver-passenger matching, chat, and profile management, using Firebase as the backend.
+### What it is
+EasyRide is a carpooling app built with Flutter. It matches passengers and drivers based on how closely their routes overlap.
 
----
+### Core features
+- Route matching using OSRM (Open Source Routing Machine) as an alternative to Google Maps
+- Role-based flows for passenger and driver
+- Real-time chat and basic profile management
 
-## 🏗️ Architecture & Data Flow
+### Tech stack
+- Flutter (Dart)
+- Maps: flutter_map + OpenStreetMap tiles
+- Routing: OSRM HTTP API (via `RouteService`)
+- Backend: Firebase (Firestore, optional Storage)
+- Image hosting: ImgBB (optional)
 
-```mermaid
-graph TD
-    A[User Launches App] --> B{Session Valid?}
-    B -- No --> C[Welcome/Login/Signup]
-    B -- Yes --> D[HomeView]
-    C --> E[Profile Creation]
-    E --> D
-    D --> F{Role}
-    F -- Passenger --> G[PassengerHomeView]
-    F -- Driver --> H[DriverHomeView]
-    G --> I[Route Setup/Search]
-    I --> J[Save Route]
-    J --> K[Show Matching Drivers]
-    K --> L[Chat with Driver]
-    H --> M[Route Setup]
-    M --> N[Save Route]
-    N --> O[See Accepted Passengers]
-    O --> P[Chat with Passenger]
+### Getting started
+1) Install Flutter and clone the repo.
+2) Provide secrets at runtime via `--dart-define` (no keys in repo):
+```bash
+flutter run \
+  --dart-define=FIREBASE_API_KEY=... \
+  --dart-define=FIREBASE_APP_ID=... \
+  --dart-define=FIREBASE_MESSAGING_SENDER_ID=... \
+  --dart-define=FIREBASE_PROJECT_ID=... \
+  --dart-define=FIREBASE_STORAGE_BUCKET=... \
+  --dart-define=IMGBB_API_KEY=...
+```
+Or create a local `.env` and use: `--dart-define-from-file=.env` (the file is gitignored).
+
+3) If you need platform folders (android/ios/etc), regenerate them:
+```bash
+flutter create .
 ```
 
----
+### Where the matching happens
+- See `lib/services/route_service.dart` for OSRM requests and match logic.
+- Firebase CRUD and higher-level flows live in `lib/services/` and the `views/` folders.
 
-## 👤 User Roles
-- **Passenger**: Searches and saves a route, views matching drivers, and can chat with drivers.
-- **Driver**: Sets up and saves a route, views accepted passengers, and can chat with passengers.
+### Project structure (high level)
+- `lib/` app code (views, widgets, services, models)
+- `pubspec.yaml` dependencies
+- Platform folders are intentionally excluded from the repo; generate with `flutter create .` when needed.
 
----
-
-## 🔑 Authentication & Profile
-- Users sign up or log in using email/phone and password.
-- After authentication, users create a profile (role, name, CNIC, images, etc.).
-- Session is managed locally for auto-login.
-
----
-
-## 🚗 Route Creation & Matching
-- **Passengers**:
-  1. Enter or select start/end locations.
-  2. Calculate and save their route.
-  3. On the dashboard, see a list of drivers whose routes match theirs (with match percentage).
-- **Drivers**:
-  1. Enter or select start/end locations.
-  2. Calculate and save their route.
-  3. On the dashboard, see accepted passengers and their routes.
-
----
-
-## 🔄 Data Flow Steps
-1. **App Launch**: Checks for a valid session and loads the appropriate home view.
-2. **Authentication**: Users log in or sign up, then create a profile.
-3. **Profile Management**: Users can update their profile and upload images.
-4. **Route Setup**:
-    - Both drivers and passengers use a map to select and save their route.
-    - Route data is stored in Firebase (Firestore).
-5. **Matching**:
-    - Passengers' routes are compared to all driver routes using road names and geospatial proximity.
-    - Matching drivers are shown on the passenger dashboard with a match percentage.
-6. **Chat**:
-    - Passengers can initiate chat with a matching driver.
-    - Drivers can chat with accepted passengers.
-7. **Session Management**: User session is stored locally for persistent login.
-
----
-
-## 📱 Main Screens & Flow
-- **Splash/Welcome**: Entry point, session check, login/signup.
-- **Profile Creation**: Role selection, personal info, image upload.
-- **Home Dashboard**:
-  - **Passenger**: Map, saved route, matching drivers list, chat.
-  - **Driver**: Map, saved route, accepted passengers, chat.
-- **Route Search/Setup**: Map-based route selection and saving.
-- **Chat**: Real-time messaging between matched users.
-
----
-
-## 🗂️ Key Files & Structure
-- `main.dart`: App entry, session check, role-based routing.
-- `views/`: UI screens (home, search, chat, profile, etc.)
-- `services/`: Business logic (Firebase, session, route, location, chat)
-- `widgets/`: Reusable UI components (map, sidebar, etc.)
-- `models/`: Data models (user, driver, route)
-
----
-
-## 🔥 Backend
-- **Firebase Firestore**: Stores users, routes, and chat data.
-- **Firebase Storage**: Stores profile and document images.
-
----
-
-## 🚦 Data Flow Example (Passenger)
-1. Passenger logs in → creates/updates profile.
-2. Sets up a route (from/to) and saves it.
-3. Dashboard shows matching drivers (with percentage).
-4. Passenger can chat with a selected driver.
-
-## 🚦 Data Flow Example (Driver)
-1. Driver logs in → creates/updates profile.
-2. Sets up a route (from/to) and saves it.
-3. Dashboard shows accepted passengers and their routes.
-4. Driver can chat with passengers.
-
----
-
-## 📌 Notes
-- All map and route logic is shared and modular for maintainability.
-- Matching logic uses both road names and geospatial proximity.
-- The app is optimized for both performance and code organization.
-
----
-
-For more details, see the code in the `lib/` directory and the comments in each file.
+### Notes
+- Secrets are provided at runtime; do not commit keys.
+- OSRM can be your own server or a hosted endpoint.
